@@ -1,1 +1,5 @@
-
+Pair,Top-1 Accuracy
+cecum_vs_ascending,0.8889
+ascending_vs_transverse,0.96
+transverse_vs_descending,0.98
+descending_vs_sigmoid,0.9135

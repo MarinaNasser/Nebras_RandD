@@ -1,0 +1,10 @@
+vim_polyp_pairwise\pairwise_data
+vim_polyp_pairwise\data
+vim_polyp_yolo\data
+.venv
+8.3.0
+8.3.x
+yolo26n.pt
+yolov8n-cbam-cls.yaml
+yolov8n-cls.pt
+yolov8n-cls.pt
