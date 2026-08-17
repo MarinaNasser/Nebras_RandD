@@ -228,19 +228,74 @@ class SegNetVGG19Modified(nn.Module):
         return self.final(d)  # raw logits; apply sigmoid outside (BCEWithLogits)
 
 
-def build_model(variant: str, num_classes: int = 1, pretrained: bool = True):
+# =====================================================================
+# Variant 3: SegFormer (Xie et al., 2021) via HuggingFace `transformers`.
+# Requires: pip install transformers
+#
+# Architecturally unrelated to the SegNet variants above - hierarchical
+# ViT encoder (MiT-b0..b5) + lightweight all-MLP decoder that fuses
+# multi-scale features directly, so there's no max-pool-index plumbing
+# to carry over. Logits come out at 1/4 input resolution; forward()
+# bilinearly upsamples back to full size before returning, so it's a
+# drop-in replacement for the SegNet variants (same call signature,
+# same raw-logits output for BCEWithLogitsLoss).
+#
+# Pretrained checkpoints used here (`nvidia/segformer-b{size}-finetuned-
+# ade-512-512`) come with a decode head already trained for (ADE20K)
+# semantic segmentation, not just an ImageNet-pretrained encoder - a
+# stronger starting point for dense prediction than VGG. The final
+# classifier layer is reinitialized for num_classes via
+# ignore_mismatched_sizes=True.
+# =====================================================================
+class SegFormerWrapper(nn.Module):
+    def __init__(self, num_classes=1, pretrained=True, size="b0"):
+        super().__init__()
+        try:
+            from transformers import SegformerForSemanticSegmentation, SegformerConfig
+        except ImportError as e:
+            raise ImportError(
+                "SegFormer variant requires the `transformers` package. "
+                "Install it with: pip install transformers"
+            ) from e
+
+        model_name = f"nvidia/segformer-{size}-finetuned-ade-512-512"
+        if pretrained:
+            self.net = SegformerForSemanticSegmentation.from_pretrained(
+                model_name, num_labels=num_classes, ignore_mismatched_sizes=True
+            )
+        else:
+            config = SegformerConfig.from_pretrained(model_name, num_labels=num_classes)
+            self.net = SegformerForSemanticSegmentation(config)
+
+    def set_encoder_trainable(self, trainable: bool):
+        # mirrors the SegNet variants' encoder-freeze/unfreeze API used by train.py;
+        # here "encoder" is the MiT transformer backbone, decode head is left trainable
+        for p in self.net.segformer.encoder.parameters():
+            p.requires_grad = trainable
+
+    def forward(self, x):
+        h, w = x.shape[-2], x.shape[-1]
+        logits = self.net(pixel_values=x).logits  # (B, num_classes, H/4, W/4)
+        return nn.functional.interpolate(logits, size=(h, w), mode="bilinear", align_corners=False)
+
+
+def build_model(variant: str, num_classes: int = 1, pretrained: bool = True, segformer_size: str = "b0"):
     variant = variant.lower()
     if variant == "modified":
         return SegNetVGG19Modified(num_classes=num_classes, pretrained=pretrained)
     elif variant == "plain":
         return SegNetVGG19Plain(num_classes=num_classes, pretrained=pretrained)
+    elif variant == "segformer":
+        return SegFormerWrapper(num_classes=num_classes, pretrained=pretrained, size=segformer_size)
     else:
-        raise ValueError(f"Unknown model variant '{variant}', expected 'modified' or 'plain'")
+        raise ValueError(
+            f"Unknown model variant '{variant}', expected 'modified', 'plain', or 'segformer'"
+        )
 
 
 if __name__ == "__main__":
     x = torch.randn(2, 3, 384, 384)
-    for variant in ["plain", "modified"]:
+    for variant in ["plain", "modified", "segformer"]:
         m = build_model(variant, num_classes=1, pretrained=False)
         y = m(x)
         n_params = sum(p.numel() for p in m.parameters())

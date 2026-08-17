@@ -142,7 +142,7 @@ def main(cfg_path):
 
     # ---- Model (transfer learning: pretrained VGG-19 encoder, not trained from scratch) ----
     model = build_model(cfg.get("model_variant", "modified"), num_classes=cfg["num_classes"],
-                         pretrained=True).to(device)
+                         pretrained=True, segformer_size=cfg.get("segformer_size", "b0")).to(device)
 
     criterion = BCEDiceLoss(bce_weight=0.5)
     scaler = torch.cuda.amp.GradScaler(enabled=(use_amp and device.type == "cuda"))

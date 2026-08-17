@@ -14,27 +14,27 @@
 # `match_mask_for_image()` function - that's the only place you'd need to touch.
 datasets:
   CVC-ClinicDB:
-    images_dir: "D:/Marina/CVC-ClinicDB/TIF/Original"
-    masks_dir: "D:/Marina/CVC-ClinicDB/TIF/Ground Truth"
+    images_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/TIF/Original"
+    masks_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/TIF/Ground Truth"
     img_ext: ".tif"
     mask_ext: ".tif"
 
   CVC-ColonDB:
-    images_dir: "D:/Marina/CVC-ColonDB/images"
-    masks_dir: "D:/Marina/CVC-ColonDB/masks"
+    images_dir: "C:/Users/Omen Max/Datasets/CVC-ColonDB/images"
+    masks_dir: "C:/Users/Omen Max/Datasets/CVC-ColonDB/masks"
     img_ext: ".png"
     mask_ext: ".png"
 
   ETIS-LaribPolypDB:
-    images_dir: "D:/Marina/ETIS-LaribPolypDB/images"
-    masks_dir: "D:/Marina/ETIS-LaribPolypDB/masks"
+    images_dir: "C:/Users/Omen Max/Datasets/ETIS-LaribPolypDB/images"
+    masks_dir: "C:/Users/Omen Max/Datasets/ETIS-LaribPolypDB/masks"
     img_ext: ".png"
     mask_ext: ".png"
 
   Kvasir-SEG:
     # From your screenshot: D:\Marina\kvasir\segmented-images\{images,masks}
-    images_dir: "D:/Marina/kvasir/segmented-images/images"
-    masks_dir: "D:/Marina/kvasir/segmented-images/masks"
+    images_dir: "C:/Users/Omen Max/Datasets/kvasir/segmented-images/images"
+    masks_dir: "C:/Users/Omen Max/Datasets/kvasir/segmented-images/masks"
     img_ext: ".jpg"    # Kvasir-SEG ships images/masks as .jpg - double check by
     mask_ext: ".jpg"   # opening the images/ folder; some mirrors use .jpg for both,
                         # which is the standard Kvasir-SEG release format
@@ -51,10 +51,18 @@ internal_val_fraction: 0.1   # fraction of the training pool set aside just for 
 
 # ---- Model ----
 encoder: "vgg19_bn"          # torchvision backbone, ImageNet-pretrained (transfer learning, not from scratch)
-model_variant: "modified"    # "modified": skip connections + 5x5 shallow blocks + dilated-conv bottleneck
-                              #             (per the polyp-segmentation SegNet literature, stronger)
-                              # "plain":    original SegNet (Badrinarayanan et al.) - use only as a baseline
+                              # (only used by the SegNet variants below; ignored for "segformer")
+model_variant: "modified"    # "modified":  skip connections + 5x5 shallow blocks + dilated-conv bottleneck
+                              #              (per the polyp-segmentation SegNet literature, stronger)
+                              # "plain":     original SegNet (Badrinarayanan et al.) - use only as a baseline
+                              # "segformer": HuggingFace SegFormer (MiT transformer encoder + all-MLP decoder),
+                              #              pip install transformers - see segformer_size below
+segformer_size: "b0"          # only used when model_variant: "segformer". One of b0 (fastest/smallest) .. b5
+                              # (largest/most accurate). Loads nvidia/segformer-{size}-finetuned-ade-512-512.
+                              # b0 is a reasonable first try given your local GPU/Colab constraints; go up
+                              # to b1/b2 if it underfits and you have the VRAM.
 freeze_encoder_epochs: 5     # freeze encoder weights for the first N epochs, then unfreeze and fine-tune
+                              # (for segformer, "encoder" = the MiT backbone; decode head stays trainable throughout)
 in_channels: 3
 num_classes: 1                # binary polyp segmentation (sigmoid output)
 

@@ -35,7 +35,7 @@ def main(cfg_path, n):
     test_ds = PolypDataset(test_pairs, transform=get_val_transforms(cfg["image_size"]))
 
     model = build_model(cfg.get("model_variant", "modified"), num_classes=cfg["num_classes"],
-                         pretrained=False).to(device)
+                         pretrained=False, segformer_size=cfg.get("segformer_size", "b0")).to(device)
     model.load_state_dict(torch.load(f"{cfg['checkpoint_dir']}/best_model.pt", map_location=device))
     model.eval()
 
