@@ -1,0 +1,36 @@
+# REAL-Colon RetinaNet polyp-detection config
+
+root_dir: "path/to/REAL-Colon"   # folder containing SSS-VVV_frames / SSS-VVV_annotations pairs
+seed: 42
+
+split:
+  train_frac: 0.70
+  val_frac: 0.15
+  test_frac: 0.15
+
+sampling:
+  frame_stride: 5                     # keep every 5th frame per video (raw REAL-Colon is ~2.7M frames total)
+  negative_frame_sample_ratio: 0.3    # keep 30% of no-polyp frames after striding (train/val only; test keeps all)
+
+image_size: 512
+batch_size: 4
+epochs: 30
+num_workers: 4
+
+lr: 1.0e-4
+lr_finetune: 1.0e-5
+weight_decay: 1.0e-4
+
+freeze_backbone_epochs: 3
+early_stopping_patience: 6
+
+score_thresh: 0.3          # model-internal confidence threshold before NMS/output
+nms_thresh: 0.4
+detections_per_img: 50
+
+use_amp: true
+save_every_n_steps: 200
+resume: true
+
+checkpoint_dir: "checkpoints"
+output_dir: "outputs"

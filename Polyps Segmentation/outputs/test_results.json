@@ -1,0 +1,8 @@
+{
+  "held_out_dataset": "ETIS-LaribPolypDB",
+  "test_loss": 0.2370762223643916,
+  "test_dice": 0.604241807296473,
+  "test_iou": 0.5570590463270902,
+  "test_acc": 0.9797084574796715,
+  "n_test_images": 196
+}

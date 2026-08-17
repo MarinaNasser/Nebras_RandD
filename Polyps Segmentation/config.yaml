@@ -1,0 +1,79 @@
+# =========================================================
+# Polyp segmentation config: SegNet (VGG-19 encoder, pretrained)
+# Cross-dataset protocol: train on 2 datasets, validate on the held-out 3rd.
+# =========================================================
+
+# ---- Dataset paths ----
+# Fill in the real paths on your machine. Each dataset needs:
+#   images_dir: folder of RGB colonoscopy frames
+#   masks_dir:  folder of binary polyp masks (white = polyp, black = background)
+#   ext:        image file extension actually used in that folder (varies by source)
+#
+# Masks and images are matched by filename stem (e.g. "23.png" <-> "23.tif").
+# If your mask filenames don't match image stems exactly, edit dataset.py's
+# `match_mask_for_image()` function - that's the only place you'd need to touch.
+datasets:
+  CVC-ClinicDB:
+    images_dir: "D:/Marina/CVC-ClinicDB/TIF/Original"
+    masks_dir: "D:/Marina/CVC-ClinicDB/TIF/Ground Truth"
+    img_ext: ".tif"
+    mask_ext: ".tif"
+
+  CVC-ColonDB:
+    images_dir: "D:/Marina/CVC-ColonDB/images"
+    masks_dir: "D:/Marina/CVC-ColonDB/masks"
+    img_ext: ".png"
+    mask_ext: ".png"
+
+  ETIS-LaribPolypDB:
+    images_dir: "D:/Marina/ETIS-LaribPolypDB/images"
+    masks_dir: "D:/Marina/ETIS-LaribPolypDB/masks"
+    img_ext: ".png"
+    mask_ext: ".png"
+
+  Kvasir-SEG:
+    # From your screenshot: D:\Marina\kvasir\segmented-images\{images,masks}
+    images_dir: "D:/Marina/kvasir/segmented-images/images"
+    masks_dir: "D:/Marina/kvasir/segmented-images/masks"
+    img_ext: ".jpg"    # Kvasir-SEG ships images/masks as .jpg - double check by
+    mask_ext: ".jpg"   # opening the images/ folder; some mirrors use .jpg for both,
+                        # which is the standard Kvasir-SEG release format
+
+# ---- Cross-dataset split ----
+# The dataset named here is held out completely for validation/testing.
+# ALL OTHER listed datasets are pooled together for training (there is no fixed
+# "must be exactly 2" requirement - add as many datasets as you like to the
+# `datasets` block above and every one except held_out_dataset joins training).
+# The internal train/val split below is carved out of that training pool for
+# early-stopping/model selection, NOT taken from the held-out dataset.
+held_out_dataset: "ETIS-LaribPolypDB"
+internal_val_fraction: 0.1   # fraction of the training pool set aside just for early stopping
+
+# ---- Model ----
+encoder: "vgg19_bn"          # torchvision backbone, ImageNet-pretrained (transfer learning, not from scratch)
+model_variant: "modified"    # "modified": skip connections + 5x5 shallow blocks + dilated-conv bottleneck
+                              #             (per the polyp-segmentation SegNet literature, stronger)
+                              # "plain":    original SegNet (Badrinarayanan et al.) - use only as a baseline
+freeze_encoder_epochs: 5     # freeze encoder weights for the first N epochs, then unfreeze and fine-tune
+in_channels: 3
+num_classes: 1                # binary polyp segmentation (sigmoid output)
+
+# ---- Training ----
+image_size: 256                # was 384: smaller kernels per step, helps avoid Windows TDR crashes
+batch_size: 4                  # was 8: same reason - smaller per-step GPU work
+epochs: 60
+lr: 1.0e-4
+lr_finetune: 1.0e-5              # lower LR once encoder unfreezes
+weight_decay: 1.0e-5
+num_workers: 4
+seed: 42
+early_stopping_patience: 12
+use_amp: true                  # mixed precision: ~2x faster per step on most NVIDIA GPUs,
+                                # also helps avoid Windows TDR timeouts (shorter kernels)
+resume: true                   # auto-resume from checkpoints/resume_checkpoint.pt if training
+                                # was interrupted (crash, TDR, power loss, etc.)
+save_every_n_steps: 50         # write a resume checkpoint every N training steps within an epoch
+
+# ---- Output ----
+checkpoint_dir: "checkpoints"
+output_dir: "outputs"
