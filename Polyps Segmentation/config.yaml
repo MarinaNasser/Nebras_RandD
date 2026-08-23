@@ -57,7 +57,7 @@ model_variant: "modified"    # "modified":  skip connections + 5x5 shallow block
                               # "plain":     original SegNet (Badrinarayanan et al.) - use only as a baseline
                               # "segformer": HuggingFace SegFormer (MiT transformer encoder + all-MLP decoder),
                               #              pip install transformers - see segformer_size below
-segformer_size: "b0"          # only used when model_variant: "segformer". One of b0 (fastest/smallest) .. b5
+segformer_size: "b3"          # only used when model_variant: "segformer". One of b0 (fastest/smallest) .. b5
                               # (largest/most accurate). Loads nvidia/segformer-{size}-finetuned-ade-512-512.
                               # b0 is a reasonable first try given your local GPU/Colab constraints; go up
                               # to b1/b2 if it underfits and you have the VRAM.

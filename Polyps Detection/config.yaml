@@ -1,6 +1,6 @@
 # REAL-Colon RetinaNet polyp-detection config
 
-root_dir: "path/to/REAL-Colon"   # folder containing SSS-VVV_frames / SSS-VVV_annotations pairs
+root_dir: "C:/Users/Omen Max/Datasets/real colon"   # folder containing SSS-VVV_frames / SSS-VVV_annotations pairs
 seed: 42
 
 split:
