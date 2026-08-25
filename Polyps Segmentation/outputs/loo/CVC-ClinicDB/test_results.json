@@ -1,0 +1,8 @@
+{
+  "held_out_dataset": "CVC-ClinicDB",
+  "test_loss": 0.34623882668762423,
+  "test_dice": 0.5403484970428585,
+  "test_iou": 0.4642367089000362,
+  "test_acc": 0.9390623304578993,
+  "n_test_images": 612
+}

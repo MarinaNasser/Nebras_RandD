@@ -1,0 +1,8 @@
+{
+  "held_out_dataset": "Kvasir-SEG",
+  "test_loss": 0.249180573284626,
+  "test_dice": 0.767760066151619,
+  "test_iou": 0.6927131348848343,
+  "test_acc": 0.9369195251464844,
+  "n_test_images": 1000
+}

@@ -165,8 +165,8 @@ class RealColonDetectionDataset(Dataset):
     """
     pairs: list of (image_path, [[xmin,ymin,xmax,ymax], ...])
     Returns (image_tensor, target_dict) with "boxes" (FloatTensor[N,4]) and
-    "labels" (Int64Tensor[N], all 1 = "polyp") - the format torchvision's
-    detection models expect.
+    "labels" (Int64Tensor[N], all 0 = "polyp", the only foreground class) -
+    the format torchvision's detection models expect.
     """
     def __init__(self, pairs, transform=None):
         self.pairs = pairs
@@ -183,8 +183,28 @@ class RealColonDetectionDataset(Dataset):
             raise RuntimeError(f"Failed to read image: {img_path}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+        # REAL-Colon annotations occasionally extend a pixel or two past the
+        # actual image edge (e.g. ymax slightly exceeding image height) - clip
+        # to the real image bounds here, before albumentations' bbox_params
+        # validator sees them, since it rejects any box outside [0, 1] after
+        # normalization. Drop any box that becomes degenerate after clipping.
+        h, w = image.shape[:2]
+        clipped = []
+        for xmin, ymin, xmax, ymax in boxes:
+            xmin_c, ymin_c = max(0.0, min(xmin, w)), max(0.0, min(ymin, h))
+            xmax_c, ymax_c = max(0.0, min(xmax, w)), max(0.0, min(ymax, h))
+            if xmax_c > xmin_c and ymax_c > ymin_c:
+                clipped.append([xmin_c, ymin_c, xmax_c, ymax_c])
+        boxes = clipped
+
         boxes = boxes if boxes else []
-        labels = [1] * len(boxes)  # single foreground class: "polyp"
+        # label 0 = "polyp" (the only foreground class). torchvision's RetinaNet,
+        # unlike Faster R-CNN, does NOT reserve label 0 for background - with
+        # NUM_CLASSES=1 in model.py the only valid class index is 0. Labeling
+        # boxes as 1 here would index a column that doesn't exist in the
+        # classification head's [num_anchors, num_classes] target tensor,
+        # which corrupts the CUDA context rather than raising a clean error.
+        labels = [0] * len(boxes)
 
         if self.transform:
             augmented = self.transform(image=image, bboxes=boxes, labels=labels)

@@ -1,0 +1,26 @@
+{
+  "CVC-ClinicDB": {
+    "held_out_dataset": "CVC-ClinicDB",
+    "test_loss": 0.34623882668762423,
+    "test_dice": 0.5403484970428585,
+    "test_iou": 0.4642367089000362,
+    "test_acc": 0.9390623304578993,
+    "n_test_images": 612
+  },
+  "CVC-ColonDB": {
+    "held_out_dataset": "CVC-ColonDB",
+    "test_loss": 0.2764255761315948,
+    "test_dice": 0.6249793229428561,
+    "test_iou": 0.5540459510573913,
+    "test_acc": 0.9579662925318668,
+    "n_test_images": 380
+  },
+  "Kvasir-SEG": {
+    "held_out_dataset": "Kvasir-SEG",
+    "test_loss": 0.249180573284626,
+    "test_dice": 0.767760066151619,
+    "test_iou": 0.6927131348848343,
+    "test_acc": 0.9369195251464844,
+    "n_test_images": 1000
+  }
+}

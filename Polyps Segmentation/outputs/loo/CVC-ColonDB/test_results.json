@@ -1,0 +1,8 @@
+{
+  "held_out_dataset": "CVC-ColonDB",
+  "test_loss": 0.2764255761315948,
+  "test_dice": 0.6249793229428561,
+  "test_iou": 0.5540459510573913,
+  "test_acc": 0.9579662925318668,
+  "n_test_images": 380
+}

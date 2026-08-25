@@ -1,0 +1,43 @@
+datasets:
+  CVC-ClinicDB:
+    images_dir: C:/Users/Omen Max/Datasets/CVC-ClinicDB/TIF/Original
+    masks_dir: C:/Users/Omen Max/Datasets/CVC-ClinicDB/TIF/Ground Truth
+    img_ext: .tif
+    mask_ext: .tif
+  CVC-ColonDB:
+    images_dir: C:/Users/Omen Max/Datasets/CVC-ColonDB/images
+    masks_dir: C:/Users/Omen Max/Datasets/CVC-ColonDB/masks
+    img_ext: .png
+    mask_ext: .png
+  ETIS-LaribPolypDB:
+    images_dir: C:/Users/Omen Max/Datasets/ETIS-LaribPolypDB/images
+    masks_dir: C:/Users/Omen Max/Datasets/ETIS-LaribPolypDB/masks
+    img_ext: .png
+    mask_ext: .png
+  Kvasir-SEG:
+    images_dir: C:/Users/Omen Max/Datasets/kvasir/segmented-images/images
+    masks_dir: C:/Users/Omen Max/Datasets/kvasir/segmented-images/masks
+    img_ext: .jpg
+    mask_ext: .jpg
+held_out_dataset: CVC-ColonDB
+internal_val_fraction: 0.1
+encoder: vgg19_bn
+model_variant: modified
+segformer_size: b3
+freeze_encoder_epochs: 5
+in_channels: 3
+num_classes: 1
+image_size: 256
+batch_size: 4
+epochs: 60
+lr: 0.0001
+lr_finetune: 1.0e-05
+weight_decay: 1.0e-05
+num_workers: 4
+seed: 42
+early_stopping_patience: 12
+use_amp: true
+resume: true
+save_every_n_steps: 50
+checkpoint_dir: checkpoints\loo\CVC-ColonDB
+output_dir: outputs\loo\CVC-ColonDB
