@@ -52,3 +52,24 @@ class BCEDiceLoss(nn.Module):
         probs = torch.sigmoid(logits)
         dice_loss = 1 - dice_coeff(probs, target)
         return self.bce_weight * bce_loss + (1 - self.bce_weight) * dice_loss
+
+def precision_score(pred_probs, target, threshold=0.5, eps=1e-7):
+    pred_bin = (pred_probs > threshold).float()
+    pred_flat = pred_bin.reshape(pred_bin.size(0), -1)
+    target_flat = target.reshape(target.size(0), -1)
+    
+    true_positives = (pred_flat * target_flat).sum(dim=1)
+    predicted_positives = pred_flat.sum(dim=1)
+    precision = (true_positives + eps) / (predicted_positives + eps)
+    return precision
+
+
+def recall_score(pred_probs, target, threshold=0.5, eps=1e-7):
+    pred_bin = (pred_probs > threshold).float()
+    pred_flat = pred_bin.reshape(pred_bin.size(0), -1)
+    target_flat = target.reshape(target.size(0), -1)
+    
+    true_positives = (pred_flat * target_flat).sum(dim=1)
+    actual_positives = target_flat.sum(dim=1)
+    recall = (true_positives + eps) / (actual_positives + eps)
+    return recall

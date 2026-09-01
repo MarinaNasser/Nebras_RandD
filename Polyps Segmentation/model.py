@@ -268,16 +268,15 @@ class SegFormerWrapper(nn.Module):
             self.net = SegformerForSemanticSegmentation(config)
 
     def set_encoder_trainable(self, trainable: bool):
-        # mirrors the SegNet variants' encoder-freeze/unfreeze API used by train.py;
-        # here "encoder" is the MiT transformer backbone, decode head is left trainable
-        for p in self.net.segformer.encoder.parameters():
+        # Freeze or unfreeze the SegFormer backbone (self.net.segformer)
+        # while keeping the decode_head trainable
+        for p in self.net.segformer.parameters():
             p.requires_grad = trainable
 
     def forward(self, x):
         h, w = x.shape[-2], x.shape[-1]
         logits = self.net(pixel_values=x).logits  # (B, num_classes, H/4, W/4)
         return nn.functional.interpolate(logits, size=(h, w), mode="bilinear", align_corners=False)
-
 
 def build_model(variant: str, num_classes: int = 1, pretrained: bool = True, segformer_size: str = "b0"):
     variant = variant.lower()
