@@ -1,0 +1,197 @@
+filename,confidence,decision,area_px,equiv_diameter_px,pct_of_frame,diameter_mm,area_mm2,size_category
+1.png,0.8947,polyp (marked),10801,117.3,0.91,5.3,21.9,small (6-9mm)
+10.png,0.9381,polyp (marked),11594,121.5,0.98,5.5,23.5,small (6-9mm)
+100.png,0.8979,polyp (marked),16192,143.6,1.37,6.5,32.8,small (6-9mm)
+101.png,0.6274,uncertain (circle),,,,,,
+102.png,0.7373,uncertain (circle),,,,,,
+103.png,0.2441,uncertain (circle),,,,,,
+104.png,0.9112,polyp (marked),14870,137.6,1.26,6.2,30.1,small (6-9mm)
+105.png,0.9999,polyp (marked),106828,368.8,9.03,16.6,216.3,large (>=10mm)
+106.png,0.9999,polyp (marked),105602,366.7,8.92,16.5,213.8,large (>=10mm)
+107.png,0.9999,polyp (marked),107481,369.9,9.08,16.6,217.6,large (>=10mm)
+108.png,0.9988,polyp (marked),144784,429.4,12.24,19.3,293.2,large (>=10mm)
+109.png,0.9999,polyp (marked),106582,368.4,9.01,16.6,215.8,large (>=10mm)
+11.png,0.9934,polyp (marked),28441,190.3,2.4,8.6,57.6,small (6-9mm)
+110.png,1.0,polyp (marked),34250,208.8,2.89,9.4,69.4,small (6-9mm)
+111.png,1.0,polyp (marked),40044,225.8,3.38,10.2,81.1,large (>=10mm)
+112.png,1.0,polyp (marked),28104,189.2,2.37,8.5,56.9,small (6-9mm)
+113.png,1.0,polyp (marked),197308,501.2,16.67,22.6,399.5,large (>=10mm)
+114.png,1.0,polyp (marked),207307,513.8,17.52,23.1,419.8,large (>=10mm)
+115.png,1.0,polyp (marked),200397,505.1,16.93,22.7,405.8,large (>=10mm)
+116.png,1.0,polyp (marked),278275,595.2,23.52,26.8,563.5,large (>=10mm)
+117.png,1.0,polyp (marked),198243,502.4,16.75,22.6,401.4,large (>=10mm)
+118.png,1.0,polyp (marked),186988,487.9,15.8,22.0,378.7,large (>=10mm)
+119.png,0.9998,polyp (marked),221627,531.2,18.73,23.9,448.8,large (>=10mm)
+12.png,0.8509,polyp (marked),10126,113.5,0.86,5.1,20.5,small (6-9mm)
+120.png,0.9999,polyp (marked),233711,545.5,19.75,24.5,473.3,large (>=10mm)
+121.png,0.9931,polyp (marked),20395,161.1,1.72,7.3,41.3,small (6-9mm)
+122.png,0.9179,polyp (marked),11148,119.1,0.94,5.4,22.6,small (6-9mm)
+123.png,0.6241,uncertain (circle),,,,,,
+124.png,1.0,polyp (marked),122995,395.7,10.39,17.8,249.1,large (>=10mm)
+125.png,1.0,polyp (marked),120909,392.4,10.22,17.7,244.8,large (>=10mm)
+126.png,0.9964,polyp (marked),21557,165.7,1.82,7.5,43.7,small (6-9mm)
+127.png,0.9849,polyp (marked),12600,126.7,1.06,5.7,25.5,small (6-9mm)
+128.png,0.8209,uncertain (circle),,,,,,
+129.png,0.842,uncertain (circle),,,,,,
+13.png,0.9972,polyp (marked),61403,279.6,5.19,12.6,124.3,large (>=10mm)
+130.png,0.9966,polyp (marked),13199,129.6,1.12,5.8,26.7,small (6-9mm)
+131.png,0.9849,polyp (marked),12600,126.7,1.06,5.7,25.5,small (6-9mm)
+132.png,0.8647,polyp (marked),10127,113.6,0.86,5.1,20.5,small (6-9mm)
+133.png,1.0,polyp (marked),29949,195.3,2.53,8.8,60.6,small (6-9mm)
+134.png,0.9999,polyp (marked),26260,182.9,2.22,8.2,53.2,small (6-9mm)
+135.png,0.9803,polyp (marked),12675,127.0,1.07,5.7,25.7,small (6-9mm)
+136.png,1.0,polyp (marked),43792,236.1,3.7,10.6,88.7,large (>=10mm)
+137.png,0.9998,polyp (marked),25011,178.5,2.11,8.0,50.6,small (6-9mm)
+138.png,0.9845,polyp (marked),12918,128.2,1.09,5.8,26.2,small (6-9mm)
+139.png,0.9853,polyp (marked),16104,143.2,1.36,6.4,32.6,small (6-9mm)
+14.png,0.9997,polyp (marked),61945,280.8,5.23,12.6,125.4,large (>=10mm)
+140.png,0.9854,polyp (marked),12584,126.6,1.06,5.7,25.5,small (6-9mm)
+141.png,0.9945,polyp (marked),19318,156.8,1.63,7.1,39.1,small (6-9mm)
+142.png,0.9997,polyp (marked),17661,150.0,1.49,6.7,35.8,small (6-9mm)
+143.png,0.9039,polyp (marked),12911,128.2,1.09,5.8,26.1,small (6-9mm)
+144.png,0.9889,polyp (marked),15488,140.4,1.31,6.3,31.4,small (6-9mm)
+145.png,0.9861,polyp (marked),18492,153.4,1.56,6.9,37.4,small (6-9mm)
+146.png,0.9948,polyp (marked),19121,156.0,1.62,7.0,38.7,small (6-9mm)
+147.png,0.9998,polyp (marked),22446,169.1,1.9,7.6,45.5,small (6-9mm)
+148.png,0.0047,uncertain (circle),,,,,,
+149.png,0.999,polyp (marked),15065,138.5,1.27,6.2,30.5,small (6-9mm)
+15.png,0.9986,polyp (marked),120001,390.9,10.14,17.6,243.0,large (>=10mm)
+150.png,1.0,polyp (marked),52212,257.8,4.41,11.6,105.7,large (>=10mm)
+151.png,0.9519,polyp (marked),11757,122.3,0.99,5.5,23.8,small (6-9mm)
+152.png,0.6829,uncertain (circle),,,,,,
+153.png,0.9982,polyp (marked),25749,181.1,2.18,8.1,52.1,small (6-9mm)
+154.png,0.9988,polyp (marked),167543,461.9,14.16,20.8,339.3,large (>=10mm)
+155.png,0.9992,polyp (marked),20556,161.8,1.74,7.3,41.6,small (6-9mm)
+156.png,0.9998,polyp (marked),188091,489.4,15.89,22.0,380.9,large (>=10mm)
+157.png,0.998,polyp (marked),182927,482.6,15.46,21.7,370.4,large (>=10mm)
+158.png,0.9943,polyp (marked),21207,164.3,1.79,7.4,42.9,small (6-9mm)
+159.png,0.9998,polyp (marked),52523,258.6,4.44,11.6,106.4,large (>=10mm)
+16.png,0.9992,polyp (marked),83544,326.1,7.06,14.7,169.2,large (>=10mm)
+160.png,0.9989,polyp (marked),57011,269.4,4.82,12.1,115.4,large (>=10mm)
+161.png,0.9999,polyp (marked),84413,327.8,7.13,14.8,170.9,large (>=10mm)
+162.png,0.9999,polyp (marked),52055,257.4,4.4,11.6,105.4,large (>=10mm)
+163.png,0.9995,polyp (marked),53580,261.2,4.53,11.8,108.5,large (>=10mm)
+164.png,0.9998,polyp (marked),72182,303.2,6.1,13.6,146.2,large (>=10mm)
+165.png,1.0,polyp (marked),17912,151.0,1.51,6.8,36.3,small (6-9mm)
+166.png,1.0,polyp (marked),27932,188.6,2.36,8.5,56.6,small (6-9mm)
+167.png,1.0,polyp (marked),31629,200.7,2.67,9.0,64.0,small (6-9mm)
+168.png,0.9999,polyp (marked),18640,154.1,1.58,6.9,37.7,small (6-9mm)
+169.png,0.7095,uncertain (circle),,,,,,
+17.png,0.9931,polyp (marked),67409,293.0,5.7,13.2,136.5,large (>=10mm)
+170.png,0.9737,polyp (marked),12954,128.4,1.09,5.8,26.2,small (6-9mm)
+171.png,0.9996,polyp (marked),107187,369.4,9.06,16.6,217.1,large (>=10mm)
+172.png,0.9995,polyp (marked),156625,446.6,13.24,20.1,317.2,large (>=10mm)
+173.png,0.9999,polyp (marked),171787,467.7,14.52,21.0,347.9,large (>=10mm)
+174.png,0.9998,polyp (marked),99030,355.1,8.37,16.0,200.5,large (>=10mm)
+175.png,0.9995,polyp (marked),156625,446.6,13.24,20.1,317.2,large (>=10mm)
+176.png,0.9999,polyp (marked),154762,443.9,13.08,20.0,313.4,large (>=10mm)
+177.png,0.9993,polyp (marked),365940,682.6,30.92,30.7,741.0,large (>=10mm)
+178.png,0.9744,polyp (marked),104119,364.1,8.8,16.4,210.8,large (>=10mm)
+179.png,0.9977,polyp (marked),225545,535.9,19.06,24.1,456.7,large (>=10mm)
+18.png,0.9838,polyp (marked),23423,172.7,1.98,7.8,47.4,small (6-9mm)
+180.png,0.9998,polyp (marked),270977,587.4,22.9,26.4,548.7,large (>=10mm)
+181.png,0.9998,polyp (marked),343570,661.4,29.03,29.8,695.7,large (>=10mm)
+182.png,1.0,polyp (marked),352554,670.0,29.79,30.1,713.9,large (>=10mm)
+183.png,0.9844,polyp (marked),38459,221.3,3.25,10.0,77.9,small (6-9mm)
+184.png,0.9943,polyp (marked),115704,383.8,9.78,17.3,234.3,large (>=10mm)
+185.png,1.0,polyp (marked),26059,182.2,2.2,8.2,52.8,small (6-9mm)
+186.png,0.9999,polyp (marked),22140,167.9,1.87,7.6,44.8,small (6-9mm)
+187.png,0.9996,polyp (marked),23933,174.6,2.02,7.9,48.5,small (6-9mm)
+188.png,0.9998,polyp (marked),99430,355.8,8.4,16.0,201.3,large (>=10mm)
+189.png,1.0,polyp (marked),157298,447.5,13.29,20.1,318.5,large (>=10mm)
+19.png,0.9355,polyp (marked),32511,203.5,2.75,9.2,65.8,small (6-9mm)
+190.png,1.0,polyp (marked),185766,486.3,15.7,21.9,376.2,large (>=10mm)
+191.png,0.1612,uncertain (circle),,,,,,
+192.png,0.0013,uncertain (circle),,,,,,
+193.png,0.0008,uncertain (circle),,,,,,
+194.png,0.0012,uncertain (circle),,,,,,
+195.png,0.003,uncertain (circle),,,,,,
+196.png,0.7776,uncertain (circle),,,,,,
+2.png,0.9332,polyp (marked),11405,120.5,0.96,5.4,23.1,small (6-9mm)
+20.png,0.4587,uncertain (circle),,,,,,
+21.png,1.0,polyp (marked),53841,261.8,4.55,11.8,109.0,large (>=10mm)
+22.png,0.4587,uncertain (circle),,,,,,
+23.png,0.7406,uncertain (circle),,,,,,
+24.png,0.5662,uncertain (circle),,,,,,
+25.png,0.9891,polyp (marked),79321,317.8,6.7,14.3,160.6,large (>=10mm)
+26.png,0.9899,polyp (marked),63114,283.5,5.33,12.8,127.8,large (>=10mm)
+27.png,0.9988,polyp (marked),56343,267.8,4.76,12.1,114.1,large (>=10mm)
+28.png,0.9999,polyp (marked),86672,332.2,7.32,14.9,175.5,large (>=10mm)
+29.png,0.9919,polyp (marked),63032,283.3,5.33,12.7,127.6,large (>=10mm)
+3.png,0.8596,polyp (marked),10444,115.3,0.88,5.2,21.1,small (6-9mm)
+30.png,0.9934,polyp (marked),60846,278.3,5.14,12.5,123.2,large (>=10mm)
+31.png,0.9172,polyp (marked),25538,180.3,2.16,8.1,51.7,small (6-9mm)
+32.png,0.9999,polyp (marked),115773,383.9,9.78,17.3,234.4,large (>=10mm)
+33.png,0.9999,polyp (marked),100104,357.0,8.46,16.1,202.7,large (>=10mm)
+34.png,1.0,polyp (marked),135208,414.9,11.43,18.7,273.8,large (>=10mm)
+35.png,0.9972,polyp (marked),70951,300.6,6.0,13.5,143.7,large (>=10mm)
+36.png,0.0235,uncertain (circle),,,,,,
+37.png,0.9999,polyp (marked),25623,180.6,2.17,8.1,51.9,small (6-9mm)
+38.png,0.9997,polyp (marked),25281,179.4,2.14,8.1,51.2,small (6-9mm)
+39.png,0.9996,polyp (marked),25296,179.5,2.14,8.1,51.2,small (6-9mm)
+4.png,0.8956,polyp (marked),10753,117.0,0.91,5.3,21.8,small (6-9mm)
+40.png,1.0,polyp (marked),50387,253.3,4.26,11.4,102.0,large (>=10mm)
+41.png,1.0,polyp (marked),53801,261.7,4.55,11.8,108.9,large (>=10mm)
+42.png,0.9978,polyp (marked),20910,163.2,1.77,7.3,42.3,small (6-9mm)
+43.png,0.6148,uncertain (circle),,,,,,
+44.png,0.9204,polyp (marked),24673,177.2,2.09,8.0,50.0,small (6-9mm)
+45.png,0.8785,polyp (marked),23345,172.4,1.97,7.8,47.3,small (6-9mm)
+46.png,0.8343,uncertain (circle),,,,,,
+47.png,0.308,uncertain (circle),,,,,,
+48.png,0.7663,uncertain (circle),,,,,,
+49.png,1.0,polyp (marked),23752,173.9,2.01,7.8,48.1,small (6-9mm)
+5.png,0.9089,polyp (marked),12061,123.9,1.02,5.6,24.4,small (6-9mm)
+50.png,1.0,polyp (marked),22587,169.6,1.91,7.6,45.7,small (6-9mm)
+51.png,0.9999,polyp (marked),27056,185.6,2.29,8.4,54.8,small (6-9mm)
+52.png,1.0,polyp (marked),153036,441.4,12.93,19.9,309.9,large (>=10mm)
+53.png,0.0165,uncertain (circle),,,,,,
+54.png,0.9997,polyp (marked),17618,149.8,1.49,6.7,35.7,small (6-9mm)
+55.png,1.0,polyp (marked),24193,175.5,2.04,7.9,49.0,small (6-9mm)
+56.png,0.9999,polyp (marked),25956,181.8,2.19,8.2,52.6,small (6-9mm)
+57.png,0.0638,uncertain (circle),,,,,,
+58.png,0.3406,uncertain (circle),,,,,,
+59.png,0.9952,polyp (marked),15625,141.0,1.32,6.3,31.6,small (6-9mm)
+6.png,0.8954,polyp (marked),10780,117.2,0.91,5.3,21.8,small (6-9mm)
+60.png,0.9806,polyp (marked),17791,150.5,1.5,6.8,36.0,small (6-9mm)
+61.png,0.9955,polyp (marked),18155,152.0,1.53,6.8,36.8,small (6-9mm)
+62.png,0.9935,polyp (marked),15536,140.6,1.31,6.3,31.5,small (6-9mm)
+63.png,1.0,polyp (marked),220021,529.3,18.59,23.8,445.5,large (>=10mm)
+64.png,1.0,polyp (marked),190303,492.2,16.08,22.2,385.4,large (>=10mm)
+65.png,1.0,polyp (marked),44082,236.9,3.73,10.7,89.3,large (>=10mm)
+66.png,1.0,polyp (marked),211724,519.2,17.89,23.4,428.7,large (>=10mm)
+67.png,1.0,polyp (marked),42062,231.4,3.55,10.4,85.2,large (>=10mm)
+68.png,0.9999,polyp (marked),20752,162.5,1.75,7.3,42.0,small (6-9mm)
+69.png,0.9265,polyp (marked),18871,155.0,1.59,7.0,38.2,small (6-9mm)
+7.png,0.9984,polyp (marked),24869,177.9,2.1,8.0,50.4,small (6-9mm)
+70.png,0.9455,polyp (marked),21959,167.2,1.86,7.5,44.5,small (6-9mm)
+71.png,0.2263,uncertain (circle),,,,,,
+72.png,0.3328,uncertain (circle),,,,,,
+73.png,0.9566,polyp (marked),18570,153.8,1.57,6.9,37.6,small (6-9mm)
+74.png,0.079,uncertain (circle),,,,,,
+75.png,0.9325,polyp (marked),11192,119.4,0.95,5.4,22.7,small (6-9mm)
+76.png,0.5469,uncertain (circle),,,,,,
+77.png,0.0076,uncertain (circle),,,,,,
+78.png,0.0029,uncertain (circle),,,,,,
+79.png,0.0017,uncertain (circle),,,,,,
+8.png,0.9714,polyp (marked),12611,126.7,1.07,5.7,25.5,small (6-9mm)
+80.png,0.9752,polyp (marked),12365,125.5,1.04,5.6,25.0,small (6-9mm)
+81.png,1.0,polyp (marked),106555,368.3,9.0,16.6,215.8,large (>=10mm)
+82.png,1.0,polyp (marked),37533,218.6,3.17,9.8,76.0,small (6-9mm)
+83.png,1.0,polyp (marked),77795,314.7,6.57,14.2,157.5,large (>=10mm)
+84.png,1.0,polyp (marked),96611,350.7,8.16,15.8,195.6,large (>=10mm)
+85.png,1.0,polyp (marked),68073,294.4,5.75,13.2,137.8,large (>=10mm)
+86.png,1.0,polyp (marked),35618,213.0,3.01,9.6,72.1,small (6-9mm)
+87.png,0.9972,polyp (marked),291835,609.6,24.66,27.4,591.0,large (>=10mm)
+88.png,0.9884,polyp (marked),15380,139.9,1.3,6.3,31.1,small (6-9mm)
+89.png,0.9773,polyp (marked),48040,247.3,4.06,11.1,97.3,large (>=10mm)
+9.png,0.7959,uncertain (circle),,,,,,
+90.png,0.9839,polyp (marked),61122,279.0,5.17,12.6,123.8,large (>=10mm)
+91.png,0.9986,polyp (marked),19382,157.1,1.64,7.1,39.2,small (6-9mm)
+92.png,0.9983,polyp (marked),15700,141.4,1.33,6.4,31.8,small (6-9mm)
+93.png,0.9309,polyp (marked),11347,120.2,0.96,5.4,23.0,small (6-9mm)
+94.png,0.8284,uncertain (circle),,,,,,
+95.png,0.6451,uncertain (circle),,,,,,
+96.png,0.2191,uncertain (circle),,,,,,
+97.png,0.8284,uncertain (circle),,,,,,
+98.png,0.9407,polyp (marked),11483,120.9,0.97,5.4,23.3,small (6-9mm)
+99.png,0.0333,uncertain (circle),,,,,,

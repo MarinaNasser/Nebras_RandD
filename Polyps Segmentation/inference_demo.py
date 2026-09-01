@@ -5,27 +5,43 @@ annotates each image based on the model's confidence there's a polyp:
 
   - confidence < 85%  -> draws a red circle in the top-left corner (flagged
                           "uncertain / needs manual review" - nothing drawn
-                          on the tissue itself, since the mask isn't trusted
-                          enough to localize anything at that confidence level)
+                          on the tissue itself)
   - confidence >= 85% -> marks the predicted polyp region (largest connected
                           component of the thresholded probability mask) with
                           a light, configurable-opacity overlay plus a thin
-                          boundary outline - tuned to stay out of the way of
-                          someone actually working from the image, not just
-                          reviewing it after the fact
+                          boundary outline, and reports its SIZE:
 
-"Confidence" is a single per-image number derived from the per-pixel sigmoid
-probability map: the mean of the top TOP_PIXEL_FRACTION most confident pixels,
-not just the single max pixel - one bright outlier pixel would otherwise
-always read as ~100% confident even on a genuinely polyp-free frame.
+SIZE ESTIMATION
+---------------
+Always computed, in pixels:
+    - area_px:            pixel count of the predicted polyp region
+    - equiv_diameter_px:  diameter of a circle with the same area
+                           (sqrt(4*area/pi)) - a single "how big" number
+                           that isn't distorted by odd/elongated shapes
+                           the way bounding-box width/height can be
+    - pct_of_frame:       area_px / (image width * height) * 100
+
+Real-world size (mm) is IMPOSSIBLE to get from pixels alone here: these are
+monocular endoscopy frames with no fixed camera-to-tissue distance, so pixel
+size isn't a constant real-world size across frames or datasets. If you have
+a calibration constant (e.g. derived from a known reference object visible in
+frame - open biopsy forceps jaw width, snare diameter, etc. - for a specific
+scope/dataset), pass --pixel_to_mm and mm-based measurements + a rough Paris-
+style size bucket (diminutive/small/large) are added on top. Without it, only
+the pixel-based numbers are reported - don't present those as clinical
+measurements, they're relative/comparative only (e.g. "this polyp took up
+more of the frame than that one"), not physical sizes.
 
 Usage:
     python inference_demo.py --config config.yaml --input_dir "path/to/images"
     python inference_demo.py --config config.yaml                     # defaults to held-out test set
     python inference_demo.py --config config.yaml --alpha 0.15        # lighter fill
-    python inference_demo.py --config config.yaml --outline_only      # no fill at all, just a boundary line
+    python inference_demo.py --config config.yaml --outline_only      # no fill, just a boundary line
+    python inference_demo.py --config config.yaml --pixel_to_mm 0.045 # if you have a calibration constant
 """
 import argparse
+import csv
+import math
 from pathlib import Path
 
 import cv2
@@ -67,9 +83,7 @@ def image_confidence(prob_map):
 
 def largest_component_mask(binary_mask):
     """Returns a binary mask containing ONLY the largest connected component
-    of `binary_mask` (same shape, 0/1), or None if the mask is empty. Used
-    instead of a bounding box so the overlay follows the polyp's actual
-    predicted shape rather than a rectangle around it."""
+    of `binary_mask` (same shape, 0/1), or None if the mask is empty."""
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(
         binary_mask.astype(np.uint8), connectivity=8)
     if num_labels <= 1:  # only the background label (0) found
@@ -79,11 +93,41 @@ def largest_component_mask(binary_mask):
     return (labels == largest_label).astype(np.uint8)
 
 
-def annotate(image_bgr, confidence, threshold, component_mask=None, alpha=0.25, outline_only=False):
+def size_category_mm(diameter_mm):
+    """Rough Paris-classification-style size bucket. Only meaningful if
+    diameter_mm came from a real pixel_to_mm calibration."""
+    if diameter_mm < 5:
+        return "diminutive (<5mm)"
+    elif diameter_mm < 10:
+        return "small (6-9mm)"
+    else:
+        return "large (>=10mm)"
+
+
+def measure_size(component_mask, orig_h, orig_w, pixel_to_mm=None):
+    """Returns a dict of size metrics for one predicted polyp region."""
+    area_px = int(component_mask.sum())
+    equiv_diameter_px = math.sqrt(4 * area_px / math.pi)
+    pct_of_frame = 100.0 * area_px / (orig_h * orig_w)
+
+    metrics = {
+        "area_px": area_px,
+        "equiv_diameter_px": round(equiv_diameter_px, 1),
+        "pct_of_frame": round(pct_of_frame, 2),
+    }
+    if pixel_to_mm is not None:
+        diameter_mm = equiv_diameter_px * pixel_to_mm
+        area_mm2 = area_px * (pixel_to_mm ** 2)
+        metrics["diameter_mm"] = round(diameter_mm, 1)
+        metrics["area_mm2"] = round(area_mm2, 1)
+        metrics["size_category"] = size_category_mm(diameter_mm)
+    return metrics
+
+
+def annotate(image_bgr, confidence, threshold, component_mask=None, alpha=0.25,
+             outline_only=False, size_metrics=None):
     """Draws either a red 'uncertain' circle (top-left) or a marked polyp
-    region, plus a confidence label, on a copy of the original-resolution
-    BGR image. alpha=0 (or outline_only=True) leaves the tissue itself fully
-    visible and marks only the boundary."""
+    region with a size label, on a copy of the original-resolution BGR image."""
     out = image_bgr.copy()
     h, w = out.shape[:2]
     label = f"{confidence*100:.1f}%"
@@ -97,19 +141,19 @@ def annotate(image_bgr, confidence, threshold, component_mask=None, alpha=0.25, 
             colored[mask_bool] = GREEN
             out = cv2.addWeighted(colored, alpha, out, 1 - alpha, 0)
 
-        # boundary outline is always drawn, however light the fill - this is
-        # what stays legible even at alpha close to 0
         contours, _ = cv2.findContours(component_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(out, contours, -1, GREEN, 2)
 
+        if size_metrics.get("diameter_mm") is not None:
+            size_label = f"~{size_metrics['diameter_mm']:.0f}mm"
+        else:
+            size_label = f"~{size_metrics['equiv_diameter_px']:.0f}px"
+
         ys, xs = np.where(component_mask.astype(bool))
         text_x, text_y = int(xs.min()), max(15, int(ys.min()) - 8)
-        cv2.putText(out, f"polyp {label}", (text_x, text_y),
+        cv2.putText(out, f"polyp {label} {size_label}", (text_x, text_y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, GREEN, 2, cv2.LINE_AA)
     else:
-        # low confidence, OR confidence >= threshold but the thresholded mask
-        # came up empty (can happen right at the boundary) - flag rather than
-        # mark nothing
         radius = max(10, int(min(h, w) * 0.04))
         center = (radius + 10, radius + 10)
         cv2.circle(out, center, radius, RED, thickness=-1)
@@ -118,7 +162,7 @@ def annotate(image_bgr, confidence, threshold, component_mask=None, alpha=0.25, 
     return out
 
 
-def main(cfg_path, input_dir, threshold, n_max, alpha, outline_only):
+def main(cfg_path, input_dir, threshold, n_max, alpha, outline_only, pixel_to_mm):
     with open(cfg_path) as f:
         cfg = yaml.safe_load(f)
 
@@ -126,12 +170,14 @@ def main(cfg_path, input_dir, threshold, n_max, alpha, outline_only):
     model = build_model(cfg.get("model_variant", "modified"), num_classes=cfg["num_classes"],
                          pretrained=False, segformer_size=cfg.get("segformer_size", "b0")).to(device)
     ckpt_path = Path(cfg["checkpoint_dir"]) / "best_model.pt"
-    # weights_only=False: this is our own checkpoint - PyTorch 2.6's stricter
-    # default can otherwise reject it depending on how/what torch version saved it.
     model.load_state_dict(torch.load(ckpt_path, map_location=device, weights_only=False))
     model.eval()
     print(f"Loaded best checkpoint from {ckpt_path}")
     print(f"Overlay style: {'outline only, no fill' if outline_only else f'fill alpha={alpha}'}")
+    if pixel_to_mm is not None:
+        print(f"Size calibration: {pixel_to_mm} mm/pixel -> mm-based size estimates enabled")
+    else:
+        print("No --pixel_to_mm given: size estimates will be pixel-based only (relative, not physical mm)")
 
     if input_dir:
         img_paths = sorted([p for p in Path(input_dir).iterdir()
@@ -162,7 +208,7 @@ def main(cfg_path, input_dir, threshold, n_max, alpha, outline_only):
 
             tensor = preprocess(image_bgr, image_size).to(device)
             logits = model(tensor)
-            probs = torch.sigmoid(logits)[0, 0].cpu().numpy()  # (image_size, image_size)
+            probs = torch.sigmoid(logits)[0, 0].cpu().numpy()
 
             conf = image_confidence(probs)
 
@@ -170,17 +216,41 @@ def main(cfg_path, input_dir, threshold, n_max, alpha, outline_only):
             binary_mask = (probs_full > 0.5).astype(np.uint8)
             component_mask = largest_component_mask(binary_mask) if conf >= threshold else None
 
+            size_metrics = {}
+            if component_mask is not None:
+                size_metrics = measure_size(component_mask, orig_h, orig_w, pixel_to_mm)
+
             annotated = annotate(image_bgr, conf, threshold, component_mask,
-                                  alpha=alpha, outline_only=outline_only)
+                                  alpha=alpha, outline_only=outline_only, size_metrics=size_metrics)
             out_path = out_dir / img_path.name
             cv2.imwrite(str(out_path), annotated)
 
             decision = "polyp (marked)" if (conf >= threshold and component_mask is not None) else "uncertain (circle)"
-            results.append((img_path.name, conf, decision))
-            print(f"  {img_path.name:<40} conf={conf*100:5.1f}%  -> {decision}")
+            row = {"filename": img_path.name, "confidence": round(conf, 4), "decision": decision}
+            row.update(size_metrics)
+            results.append(row)
+
+            size_str = ""
+            if size_metrics:
+                if "diameter_mm" in size_metrics:
+                    size_str = f" | ~{size_metrics['diameter_mm']}mm ({size_metrics['size_category']})"
+                else:
+                    size_str = f" | ~{size_metrics['equiv_diameter_px']}px, {size_metrics['pct_of_frame']}% of frame"
+            print(f"  {img_path.name:<40} conf={conf*100:5.1f}%  -> {decision}{size_str}")
+
+    csv_path = out_dir / "size_estimates.csv"
+    fieldnames = ["filename", "confidence", "decision", "area_px", "equiv_diameter_px", "pct_of_frame"]
+    if pixel_to_mm is not None:
+        fieldnames += ["diameter_mm", "area_mm2", "size_category"]
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in results:
+            writer.writerow({k: row.get(k, "") for k in fieldnames})
 
     print(f"\nSaved {len(results)} annotated image(s) to {out_dir}")
-    n_uncertain = sum(1 for _, _, d in results if "uncertain" in d)
+    print(f"Saved per-image size estimates to {csv_path}")
+    n_uncertain = sum(1 for r in results if "uncertain" in r["decision"])
     print(f"  {len(results) - n_uncertain} confident (marked) | {n_uncertain} uncertain (circle)")
 
 
@@ -193,10 +263,12 @@ if __name__ == "__main__":
                          help="Confidence threshold for marking the polyp vs an uncertain-flag circle")
     parser.add_argument("--n", type=int, default=None, help="Optional cap on number of images to process")
     parser.add_argument("--alpha", type=float, default=0.25,
-                         help="Fill opacity for the polyp overlay, 0.0-1.0 (default 0.25 - light enough "
-                              "to keep tissue detail visible underneath). Ignored if --outline_only is set.")
+                         help="Fill opacity for the polyp overlay, 0.0-1.0 (default 0.25). Ignored if --outline_only.")
     parser.add_argument("--outline_only", action="store_true",
-                         help="Draw only the boundary line around the predicted polyp, no fill at all - "
-                              "leaves the tissue fully visible for someone actively working from the image.")
+                         help="Draw only the boundary line, no fill - leaves tissue fully visible.")
+    parser.add_argument("--pixel_to_mm", type=float, default=None,
+                         help="Calibration constant (millimeters per pixel) if known for this scope/dataset. "
+                              "Without it, size is reported in pixels/percent-of-frame only (relative, not "
+                              "a physical measurement).")
     args = parser.parse_args()
-    main(args.config, args.input_dir, args.threshold, args.n, args.alpha, args.outline_only)
+    main(args.config, args.input_dir, args.threshold, args.n, args.alpha, args.outline_only, args.pixel_to_mm)
