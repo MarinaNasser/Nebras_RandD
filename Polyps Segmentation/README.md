@@ -19,6 +19,19 @@ pip install -r requirements.txt
 
 GPU strongly recommended (SegNet + VGG-19 is heavy). Works on CPU but will be slow.
 
+## Interactive Gradio inference demo
+
+After installing the requirements, launch the browser-based demo with:
+
+```bash
+python gradio_app.py
+```
+
+Then open `http://127.0.0.1:7860`. Upload an endoscopy frame to see the contour
+overlay, binary segmentation mask, probability heatmap, confidence, and runtime.
+Use `--share` to request a temporary public Gradio link, or select a different
+checkpoint with `--checkpoint path/to/model.pt`.
+
 ## 2. Point the config at your data
 
 Open `config.yaml` and fill in the real `images_dir` / `masks_dir` / extensions for

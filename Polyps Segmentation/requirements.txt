@@ -6,3 +6,4 @@ numpy>=1.23
 PyYAML>=6.0
 tqdm>=4.65
 matplotlib>=3.7
+gradio>=5.0,<7.0

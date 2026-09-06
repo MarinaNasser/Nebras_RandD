@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 from dataset import PolypDataset, list_pairs, get_train_transforms, get_val_transforms
 from model import build_model
-from metrics import BCEDiceLoss, dice_coeff, iou_score, pixel_accuracy
+from metrics import BCEDiceLoss
 
 
 def set_seed(seed):
@@ -168,17 +168,14 @@ def main(cfg_path):
     ).to(device)
 
     criterion = BCEDiceLoss(bce_weight=0.5)
-    # 1. Fix GradScaler warning
     scaler = torch.amp.GradScaler("cuda", enabled=(use_amp and device.type == "cuda"))
 
-    # 2. Add prec/rec keys to history
     history = {
         "train_loss": [], "val_loss": [],
         "train_dice": [], "val_dice": [],
         "train_iou": [], "val_iou": [],
         "train_prec": [], "val_prec": [],
-        "train_rec": [], "val_rec": [],
-        "per_dataset": []
+        "train_rec": [], "val_rec": []
     }
 
     best_val_dice = -1.0
@@ -200,11 +197,11 @@ def main(cfg_path):
             encoder_unfrozen = True
             optimizer = torch.optim.Adam(model.parameters(), lr=cfg["lr_finetune"], weight_decay=cfg["weight_decay"])
 
-        # Unpack all 6 returned values (including precision & recall)
-        train_loss, train_dice, train_iou, train_prec, train_rec, train_ds_res = run_epoch(
+        # Unpack all 5 returned values
+        train_loss, train_dice, train_iou, train_prec, train_rec = run_epoch(
             model, train_loader, criterion, optimizer, device, train=True, scaler=scaler, use_amp=use_amp
         )
-        val_loss, val_dice, val_iou, val_prec, val_rec, val_ds_res = run_epoch(
+        val_loss, val_dice, val_iou, val_prec, val_rec = run_epoch(
             model, val_loader, criterion, optimizer, device, train=False, scaler=scaler, use_amp=use_amp
         )
 
@@ -213,7 +210,6 @@ def main(cfg_path):
         history["train_iou"].append(train_iou); history["val_iou"].append(val_iou)
         history["train_prec"].append(train_prec); history["val_prec"].append(val_prec)
         history["train_rec"].append(train_rec); history["val_rec"].append(val_rec)
-        history["per_dataset"].append({"epoch": epoch, "train": train_ds_res, "val": val_ds_res})
 
         print(f"Epoch {epoch:3d}/{cfg['epochs']} | "
               f"train_loss: {train_loss:.4f} dice: {train_dice:.4f} iou: {train_iou:.4f} prec: {train_prec:.4f} rec: {train_rec:.4f} | "
@@ -223,13 +219,14 @@ def main(cfg_path):
             best_val_dice = val_dice
             epochs_no_improve = 0
             torch.save(model.state_dict(), ckpt_dir / "best_model.pt")
-            print(f"  -> new best overall val Dice {best_val_dice:.4f}, checkpoint saved")
+            print(f"  -> new best val Dice {best_val_dice:.4f}, checkpoint saved")
         else:
             epochs_no_improve += 1
 
         if epochs_no_improve >= cfg["early_stopping_patience"]:
             print(f"\nEarly stopping triggered at epoch {epoch}")
             break
+
     with open(out_dir / "history.json", "w") as f:
         json.dump(history, f, indent=2)
 
@@ -252,17 +249,26 @@ def main(cfg_path):
     print("\n" + "=" * 80)
     print(f"{'DATASET':<20}{'SPLIT':<10}{'DICE':<12}{'IOU':<12}{'PRECISION':<12}{'RECALL':<12}{'COUNT':<8}")
     print("=" * 80)
+    
+    results = {}
     for split_name, loader, count in splits:
         loss, dice, iou, prec, rec = run_epoch(
             model, loader, criterion, optimizer, device, train=False, scaler=scaler, use_amp=use_amp
         )
+        results[split_name] = {
+            "loss": loss,
+            "dice": dice,
+            "iou": iou,
+            "precision": prec,
+            "recall": rec,
+            "count": count
+        }
         print(f"{'ETIS-LaribPolypDB':<20}{split_name:<10}{dice:<12.4f}{iou:<12.4f}{prec:<12.4f}{rec:<12.4f}{count:<8}")
     print("=" * 80)
 
-
     with open(out_dir / "metrics.json", "w") as f:
         json.dump(results, f, indent=2)
-    print(f"Results saved under: {out_dir}")
+    print(f"Results saved under: {out_dir / 'metrics.json'}")
 
 
 if __name__ == "__main__":

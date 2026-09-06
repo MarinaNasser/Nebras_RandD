@@ -6,10 +6,10 @@
 # ---- Dataset paths ----
 datasets:
   CVC-ClinicDB:
-    images_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/TIF/Original"
-    masks_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/TIF/Ground Truth"
-    img_ext: ".tif"
-    mask_ext: ".tif"
+    images_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/PNG/Original"
+    masks_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/PNG/Ground Truth"
+    img_ext: ".png"
+    mask_ext: ".png"
 
   CVC-ColonDB:
     images_dir: "C:/Users/Omen Max/Datasets/CVC-ColonDB/images"
