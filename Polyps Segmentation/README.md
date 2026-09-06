@@ -32,6 +32,22 @@ overlay, binary segmentation mask, probability heatmap, confidence, and runtime.
 Use `--share` to request a temporary public Gradio link, or select a different
 checkpoint with `--checkpoint path/to/model.pt`.
 
+## Validate on external datasets
+
+Scan all top-level datasets in `C:\Users\Omen Max\Datasets`, automatically skip
+the training datasets listed in `config.yaml`, and benchmark the trained model:
+
+```bash
+python validate_external_datasets.py
+```
+
+The command writes `external_validation.json` and `external_validation.csv` under
+`outputs/external_validation`. Raster segmentation masks are paired automatically
+when available; datasets with only image-level or detection annotations receive
+timing results but no Dice/IoU. For a quick smoke test, use `--max-images 10`.
+To test exactly 100 images distributed across the eligible datasets, use
+`--total-images 100`; selection is reproducible with `--seed` (default: 42).
+
 ## 2. Point the config at your data
 
 Open `config.yaml` and fill in the real `images_dir` / `masks_dir` / extensions for

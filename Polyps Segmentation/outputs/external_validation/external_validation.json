@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "checkpoint": "C:\\Users\\Omen Max\\Marina\\Nebras_RandD\\Polyps Segmentation\\checkpoints\\best_model.pt",
+    "device": "cuda",
+    "image_size": 512,
+    "threshold": 0.5,
+    "batch_size": 1,
+    "seed": 42,
+    "excluded_training_datasets": [
+      "CVC-ClinicDB",
+      "CVC-ColonDB",
+      "ETIS-LaribPolypDB",
+      "Kvasir-SEG"
+    ]
+  },
+  "datasets": {
+    "(LIMUC) Dataset": {
+      "images": 15,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.3959635002538562,
+      "end_to_end_seconds": 0.5240787006914616,
+      "avg_inference_ms": 26.397566683590412,
+      "avg_end_to_end_ms": 34.938580046097435,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "Bronchoscopic Datasets": {
+      "images": 15,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.40120950038544834,
+      "end_to_end_seconds": 0.5338455003220588,
+      "avg_inference_ms": 26.747300025696557,
+      "avg_end_to_end_ms": 35.589700021470584,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "C3VD": {
+      "images": 14,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.44133979990147054,
+      "end_to_end_seconds": 0.8183456994593143,
+      "avg_inference_ms": 31.52427142153361,
+      "avg_end_to_end_ms": 58.453264247093884,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "ERCPMP": {
+      "images": 14,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.39559810026548803,
+      "end_to_end_seconds": 0.5351290996186435,
+      "avg_inference_ms": 28.257007161820574,
+      "avg_end_to_end_ms": 38.223507115617394,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "LD Polyp Video": {
+      "images": 14,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.3908720996696502,
+      "end_to_end_seconds": 0.5468218994792551,
+      "avg_inference_ms": 27.9194356906893,
+      "avg_end_to_end_ms": 39.05870710566108,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "PolypGen": {
+      "images": 14,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.4644295999314636,
+      "end_to_end_seconds": 0.6851205995772034,
+      "avg_inference_ms": 33.1735428522474,
+      "avg_end_to_end_ms": 48.937185684085954,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "real colon": {
+      "images": 14,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "forward_seconds": 0.4532379999291152,
+      "end_to_end_seconds": 0.6779462003614753,
+      "avg_inference_ms": 32.37414285207966,
+      "avg_end_to_end_ms": 48.42472859724824,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    },
+    "OVERALL": {
+      "images": 100,
+      "paired_masks": 0,
+      "unreadable": 0,
+      "avg_inference_ms": 29.42650600336492,
+      "avg_end_to_end_ms": 43.21287699509412,
+      "mean_dice": null,
+      "mean_iou": null,
+      "pixel_accuracy": null
+    }
+  }
+}
