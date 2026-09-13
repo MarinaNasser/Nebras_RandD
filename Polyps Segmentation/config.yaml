@@ -6,26 +6,26 @@
 # ---- Dataset paths ----
 datasets:
   CVC-ClinicDB:
-    images_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/PNG/Original"
-    masks_dir: "C:/Users/Omen Max/Datasets/CVC-ClinicDB/PNG/Ground Truth"
+    images_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/CVC-ClinicDB/PNG/Original" 
+    masks_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/CVC-ClinicDB/PNG/Ground Truth"
     img_ext: ".png"
     mask_ext: ".png"
 
   CVC-ColonDB:
-    images_dir: "C:/Users/Omen Max/Datasets/CVC-ColonDB/images"
-    masks_dir: "C:/Users/Omen Max/Datasets/CVC-ColonDB/masks"
+    images_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/CVC-ColonDB/images"
+    masks_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/CVC-ColonDB/masks"
     img_ext: ".png"
     mask_ext: ".png"
 
   ETIS-LaribPolypDB:
-    images_dir: "C:/Users/Omen Max/Datasets/ETIS-LaribPolypDB/images"
-    masks_dir: "C:/Users/Omen Max/Datasets/ETIS-LaribPolypDB/masks"
+    images_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/ETIS-LaribPolypDB/images"
+    masks_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/ETIS-LaribPolypDB/masks"
     img_ext: ".png"
     mask_ext: ".png"
 
   Kvasir-SEG:
-    images_dir: "C:/Users/Omen Max/Datasets/kvasir/segmented-images/images"
-    masks_dir: "C:/Users/Omen Max/Datasets/kvasir/segmented-images/masks"
+    images_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/kvasir/segmented-images/images"
+    masks_dir: "C:/Users/Omen Max/Datasets/Colonoscopy Datasets/kvasir/segmented-images/masks"
     img_ext: ".jpg"
     mask_ext: ".jpg"
 
@@ -59,3 +59,18 @@ save_every_n_steps: 50
 # ---- Output ----
 checkpoint_dir: "checkpoints"
 output_dir: "outputs"
+
+ # ---- Hard-negative fine-tuning: teach the model to ignore the scope. ----
+# No mask files are needed. Every image here is treated as NO-POLYP
+# and an all-zero mask is generated automatically in memory.
+finetune_negatives:
+  images_dir: "C:/Users/Omen Max/Datasets/scope images"
+  img_ext: ".bmp"
+  epochs: 15
+  lr: 1.0e-6
+  batch_size: 4
+  positive_mix_ratio: 1.0
+  max_val_dice_drop: 0.02
+  patience: 3
+  fp_threshold: 0.5
+  source_checkpoint: "checkpoints/best_model.pt"

@@ -12,6 +12,7 @@ import yaml
 
 from inference_demo import annotate_contours, image_confidence, preprocess
 from model import build_model
+from finetune_scope_negatives import _convert_segformer_state_dict_layout, _extract_state_dict
 
 
 ROOT = Path(__file__).resolve().parent
@@ -39,9 +40,8 @@ def load_model(config_path: Path, checkpoint_path: Path | None = None):
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
 
     state = torch.load(checkpoint, map_location=DEVICE, weights_only=False)
-    # Also accept checkpoints that wrap the weights in a training-state dictionary.
-    if isinstance(state, dict) and "model_state_dict" in state:
-        state = state["model_state_dict"]
+    state = _extract_state_dict(state)
+    state = _convert_segformer_state_dict_layout(state, model)
     model.load_state_dict(state)
     model.eval()
     return model, cfg, checkpoint

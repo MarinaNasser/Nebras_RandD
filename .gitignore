@@ -1,0 +1,63 @@
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments and Python build artifacts
+.venv/
+venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# Jupyter temporary files (keep notebooks tracked)
+.ipynb_checkpoints/
+
+# Training outputs, logs, and model weights
+outputs/
+*_outputs/
+checkpoints/
+weights/
+runs/
+wandb/
+mlruns/
+lightning_logs/
+*.log
+events.out.tfevents.*
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+
+# Generated localization datasets and results
+/Localization/vim_polyp_pairwise/pairwise_data/
+/Localization/vim_polyp_pairwise/data/
+/Localization/vim_polyp_pairwise/results/
+/Localization/vim_polyp_yolo/data/
+/Localization/vim_polyp_yolo/yolo_classification_data/
+/Localization/vim_polyp_yolo/results/
+
+# Local credentials (keep example environment files)
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# Editor and operating-system temporary files
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
