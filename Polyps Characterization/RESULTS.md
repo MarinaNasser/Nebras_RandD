@@ -1,5 +1,21 @@
 # ERCPMP JNET baseline — 2026-09-13
 
+## Result figures
+
+Patient-level metrics; confusion matrix rows are true labels and columns are
+predicted labels. PNGs are saved at 300 DPI, with PDF copies in the same folder.
+Regenerate with `python 'Polyps Characterization/plot_results.py'` from the repository root.
+
+![Confusion matrix](outputs/ercpmp_jnet/figures/confusion_matrix.png)
+
+![Training curves](outputs/ercpmp_jnet/figures/training_curves.png)
+
+![Per-class performance](outputs/ercpmp_jnet/figures/per_class_metrics.png)
+
+![Test summary](outputs/ercpmp_jnet/figures/test_summary.png)
+
+## Evaluation
+
 Training completed on the local RTX 5070 GPU. ResNet-18 was initialized from
 ImageNet and trained on crops from the existing SegFormer-B3 checkpoint.
 
