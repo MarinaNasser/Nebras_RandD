@@ -234,7 +234,12 @@ def save_class_samples(records, out_path, classes):
 # Splits, dataset, model, training (mirrors the ERCPMP JNET pipeline pattern)
 # --------------------------------------------------------------------------
 def video_level_split(records, classes, seed):
-    """Assign whole videos to train/val/test so no video's frames leak across splits."""
+    """Keep videos together and require every observed class in all three splits.
+
+    Class coverage takes priority over the approximate 60/20/20 video ratio.
+    Ignore metadata classes without crops; raise if an observed class cannot
+    be represented in every split.
+    """
     rng = random.Random(seed)
     video_classes = defaultdict(set)
     for r in records:
@@ -245,22 +250,71 @@ def video_level_split(records, classes, seed):
     for vids in video_classes.values():
         for c in vids:
             class_video_counts[c] += 1
-    usable_classes = [c for c in classes if class_video_counts[c] >= MIN_VIDEOS_PER_CLASS]
-    dropped = [c for c in classes if c not in usable_classes]
-    if dropped:
-        print(f'Dropping classes with <{MIN_VIDEOS_PER_CLASS} distinct videos: {dropped} '
-              f'(counts: { {c: class_video_counts[c] for c in dropped} })')
+    absent = [c for c in classes if class_video_counts[c] == 0]
+    if absent:
+        print(f'Excluding metadata classes with no extracted crops: {absent}')
+    classes = [c for c in classes if class_video_counts[c] > 0]
+    if not classes:
+        raise ValueError('No extracted crops match the requested classes; cannot create splits.')
+    insufficient = {c: class_video_counts[c] for c in classes
+                    if class_video_counts[c] < MIN_VIDEOS_PER_CLASS}
+    if insufficient:
+        raise ValueError('Every class needs at least 3 distinct videos with extracted crops '
+                         'for train/val/test coverage without video leakage. '
+                         f'Insufficient video counts: {insufficient}')
 
-    videos = sorted(v for v, cls in video_classes.items() if cls & set(usable_classes))
+    videos = sorted(video_classes)
     rng.shuffle(videos)
     n = max(1, round(len(videos) * 0.2))
+    split_names = ('train', 'val', 'test')
+    targets = dict(train=len(videos) - 2 * n, val=n, test=n)
+    members = {s: set() for s in split_names}
     assignment = {}
-    for i, v in enumerate(videos):
-        assignment[v] = 'test' if i < n else 'val' if i < 2 * n else 'train'
+    failed = set()
+
+    def cover_classes():
+        # Backtracking handles videos that carry multiple histology classes.
+        state = tuple(frozenset(members[s]) for s in split_names)
+        if state in failed:
+            return False
+        unmet = []
+        for s in split_names:
+            covered = set().union(*(video_classes[v] for v in members[s]))
+            for c in classes:
+                if c not in covered:
+                    candidates = [v for v in videos
+                                  if v not in assignment and c in video_classes[v]]
+                    if not candidates:
+                        failed.add(state)
+                        return False
+                    unmet.append((s, c, candidates))
+        if not unmet:
+            return True
+        s, _, candidates = min(unmet, key=lambda item: len(item[2]))
+        needed = {c for split, c, _ in unmet if split == s}
+        candidates.sort(key=lambda v: -len(video_classes[v] & needed))
+        for v in candidates:
+            assignment[v] = s
+            members[s].add(v)
+            if cover_classes():
+                return True
+            members[s].remove(v)
+            del assignment[v]
+        failed.add(state)
+        return False
+
+    if not cover_classes():
+        raise ValueError('Cannot place every class in train/val/test while keeping videos '
+                         'together: the overlap of classes across videos prevents coverage.')
+    for v in videos:
+        if v not in assignment:
+            s = max(split_names, key=lambda s: targets[s] - len(members[s]))
+            assignment[v] = s
+            members[s].add(v)
 
     out = [dict(r, split=assignment[r['video']]) for r in records
-           if r['video'] in assignment and r['label'] in usable_classes]
-    return out, usable_classes
+           if r['video'] in assignment and r['label'] in classes]
+    return out, list(classes)
 
 
 def transform(train=False):
@@ -296,11 +350,37 @@ def evaluate(model, rows, classes, device):
     probs = []
     for x, _ in DataLoader(Crops(rows, classes), batch_size=16):
         probs.extend(model(x.to(device)).softmax(1).cpu().tolist())
-    y = [classes.index(r['label']) for r in rows]
-    pred = [int(np.argmax(p)) for p in probs]
-    report = classification_report(y, pred, labels=list(range(len(classes))), target_names=classes,
-                                    zero_division=0, output_dict=True)
-    return dict(report=report, confusion_matrix=confusion_matrix(y, pred, labels=list(range(len(classes)))).tolist())
+    return summarize_predictions(rows, probs, classes)
+
+
+def summarize_predictions(rows, probs, classes):
+    """Score crops and equal-weight probability averages for each distinct lesion."""
+    if len(rows) != len(probs):
+        raise ValueError('Each crop must have exactly one prediction.')
+
+    def metrics(items):
+        y = [classes.index(item['label']) for item in items]
+        pred = [int(np.argmax(item['probabilities'])) for item in items]
+        return dict(report=classification_report(
+            y, pred, labels=list(range(len(classes))), target_names=classes,
+            zero_division=0, output_dict=True),
+            confusion_matrix=confusion_matrix(
+                y, pred, labels=list(range(len(classes)))).tolist())
+
+    crops = [dict(path=r['path'], unique_object_id=r['unique_object_id'],
+                  video=r['video'], label=r['label'], probabilities=p)
+             for r, p in zip(rows, probs)]
+    grouped = defaultdict(list)
+    for crop in crops:
+        grouped[crop['unique_object_id']].append(crop)
+    lesions = []
+    for uid, items in sorted(grouped.items()):
+        if len({(item['video'], item['label']) for item in items}) != 1:
+            raise ValueError(f'Conflicting video or label for lesion {uid}')
+        lesions.append(dict(unique_object_id=uid, video=items[0]['video'],
+                            label=items[0]['label'], n_crops=len(items),
+                            probabilities=np.mean([item['probabilities'] for item in items], axis=0).tolist()))
+    return dict(crop=metrics(crops), lesion=metrics(lesions), predictions=lesions)
 
 
 def train(records, classes, out_dir, epochs, patience, seed, device):
@@ -309,14 +389,16 @@ def train(records, classes, out_dir, epochs, patience, seed, device):
         print('Fewer than 2 classes have enough video diversity to train on. Stopping before training.')
         return
     splits = {s: [r for r in rows if r['split'] == s] for s in ['train', 'val', 'test']}
-    summary = {s: dict(images=len(rr), videos=len({r['video'] for r in rr}),
+    summary = {s: dict(images=len(rr), lesions=len({r['unique_object_id'] for r in rr}),
+                        videos=len({r['video'] for r in rr}),
                         classes=dict(Counter(r['label'] for r in rr))) for s, rr in splits.items()}
     print(json.dumps(summary, indent=2))
     (out_dir / 'split_summary.json').write_text(json.dumps(summary, indent=2))
+    (out_dir / 'split_records.json').write_text(json.dumps(rows, indent=2))
     for s, rr in splits.items():
         missing = set(classes) - {r['label'] for r in rr}
         if missing:
-            print(f'WARNING: split "{s}" has zero examples for {missing}; metrics for those classes will be 0/undefined.')
+            raise ValueError(f'Split "{s}" is missing classes: {missing}')
 
     device = torch.device(device)
     m = classifier(len(classes)).to(device)
@@ -339,8 +421,10 @@ def train(records, classes, out_dir, epochs, patience, seed, device):
             loss = torch.nn.functional.cross_entropy(m(x.to(device)), y.to(device))
             loss.backward(); opt.step(); losses.append(loss.item())
         val = evaluate(m, splits['val'], classes, device) if splits['val'] else None
-        score = val['report']['macro avg']['f1-score'] if val else float(np.mean(losses)) * -1
-        history.append(dict(epoch=epoch + 1, loss=float(np.mean(losses)), val_macro_f1=score))
+        score = val['lesion']['report']['macro avg']['f1-score']
+        history.append(dict(epoch=epoch + 1, loss=float(np.mean(losses)),
+                            val_lesion_macro_f1=score,
+                            val_crop_macro_f1=val['crop']['report']['macro avg']['f1-score']))
         print(history[-1], flush=True)
         if score > best:
             best, stale = score, 0
@@ -356,7 +440,7 @@ def train(records, classes, out_dir, epochs, patience, seed, device):
     if splits['test']:
         test = evaluate(m, splits['test'], classes, device)
         (out_dir / 'test_results.json').write_text(json.dumps(test, indent=2))
-        print(json.dumps(test['report'], indent=2))
+        print(json.dumps(dict(crop=test['crop']['report'], lesion=test['lesion']['report']), indent=2))
     else:
         print('No test videos available for these classes; skipping held-out evaluation.')
 
